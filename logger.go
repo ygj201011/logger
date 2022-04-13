@@ -47,7 +47,6 @@ type Logger interface {
 	Fields() Fields
 
 	SetLevel(level Level)
-	IsInit() bool
 }
 
 type Loggable interface {
@@ -134,9 +133,7 @@ func (l MyLogger) Print(args ...interface{}) {
 		fmt.Println(args)
 	}
 }
-func (l MyLogger) IsInit() bool {
-	return isInit
-}
+
 func (l MyLogger) Printf(format string, args ...interface{}) {
 	// _, file, line, _ := runtime.Caller(1)
 	// fileList := strings.Split(file, "/")
@@ -418,6 +415,7 @@ func InitLogger(logger LoggerConfig) {
 	Log = MyLogger{
 		*zap.New(core),
 	}
+	isInit = true
 
 }
 
