@@ -12,7 +12,6 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-type Level uint32
 type Logger interface {
 	Print(args ...interface{})
 	Printf(format string, args ...interface{})
