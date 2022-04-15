@@ -47,6 +47,7 @@ type Logger interface {
 	Fields() Fields
 
 	SetLevel(level Level)
+	IsInit() bool
 }
 
 type Loggable interface {
@@ -78,6 +79,7 @@ func (fields Fields) WithFields(newFields Fields) Fields {
 
 	return allFields
 }
+
 type Level uint32
 
 // These are the different logging levels. You can set the logging level to log
@@ -123,194 +125,220 @@ var (
 )
 
 type MyLogger struct {
-	zap.Logger
+	log    *zap.Logger
+	level  Level
+	prefix []string
+	fields Fields
 }
 
 func (l MyLogger) Print(args ...interface{}) {
 	if isInit {
-		l.Sugar().Info(args...)
+		l.log.Sugar().Info(args...)
 	} else {
 		fmt.Println(args)
 	}
 }
-
+func (l MyLogger) IsInit() bool {
+	return isInit
+}
 func (l MyLogger) Printf(format string, args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.Sugar().Infof(format, args...)
+		l.log.Sugar().Infof(format, args...)
 	} else {
 		fmt.Printf(format+"\r\n", args...)
 	}
 }
 func (l MyLogger) Println(args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.Sugar().Info(args...)
+		l.log.Sugar().Info(args...)
 	} else {
 		fmt.Println(args)
 	}
 }
 func (l MyLogger) Trace(args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.Sugar().Debug(args...)
+		if l.level == TraceLevel {
+			l.log.Sugar().Debug(args...)
+		}
 	} else {
 		fmt.Println(args)
 	}
 }
 func (l MyLogger) Tracef(format string, args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.Sugar().Debugf(format, args...)
+		if l.level == TraceLevel {
+			l.log.Sugar().Debugf(format, args...)
+		}
 	} else {
 		fmt.Printf(format+"\r\n", args...)
 	}
 }
 
 func (l MyLogger) Debug(args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.Sugar().Debug(args...)
+		l.log.Sugar().Debug(args...)
 	} else {
 		fmt.Println(args)
 	}
 }
 func (l MyLogger) Debugf(format string, args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.Sugar().Debugf(format, args...)
+		l.log.Sugar().Debugf(format, args...)
 	} else {
 		fmt.Printf(format+"\r\n", args...)
 	}
 }
 func (l MyLogger) Info(args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.Sugar().Info(args...)
+		l.log.Sugar().Info(args...)
 	} else {
 		fmt.Println(args)
 	}
 }
 func (l MyLogger) Infof(format string, args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.Sugar().Infof(format, args...)
+		l.log.Sugar().Infof(format, args...)
 	} else {
 		fmt.Printf(format+"\r\n", args...)
 	}
 }
 func (l MyLogger) Warn(args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.Sugar().Warn(args...)
+		l.log.Sugar().Warn(args...)
 	} else {
 		fmt.Println(args)
 	}
 }
 func (l MyLogger) Warnf(format string, args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.Sugar().Warnf(format, args...)
+		l.log.Sugar().Warnf(format, args...)
 	} else {
 		fmt.Printf(format+"\r\n", args...)
 	}
 }
 func (l MyLogger) Panic(args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.Sugar().Panic(args...)
+		l.log.Sugar().Panic(args...)
 	} else {
 		fmt.Println(args)
 	}
 }
 func (l MyLogger) Panicf(format string, args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.Sugar().Panicf(format, args...)
+		l.log.Sugar().Panicf(format, args...)
 	} else {
 		fmt.Printf(format+"\r\n", args...)
 	}
 }
 func (l MyLogger) Fatal(args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.Sugar().Fatal(args...)
+		l.log.Sugar().Fatal(args...)
 	} else {
 		fmt.Println(args)
 	}
 }
 func (l MyLogger) Error(args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.Sugar().Error(args...)
+		l.log.Sugar().Error(args...)
 	} else {
 		fmt.Println(args)
 	}
 }
 func (l MyLogger) Errorf(format string, args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.Sugar().Errorf(format, args...)
+		l.log.Sugar().Errorf(format, args...)
 	} else {
 		fmt.Printf(format+"\r\n", args...)
 	}
 }
 func (l MyLogger) Fatalf(format string, args ...interface{}) {
-	// _, file, line, _ := runtime.Caller(1)
-	// fileList := strings.Split(file, "/")
-	// format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	_, file, line, _ := runtime.Caller(1)
+	fileList := strings.Split(file, "/")
+	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.Sugar().Fatalf(format, args...)
+		l.log.Sugar().Fatalf(format, args...)
 	} else {
 		fmt.Printf(format+"\r\n", args...)
 	}
 }
-func (l MyLogger) WithPrefix(prefix string) Logger {
-	return MyLogger{*l.Named(prefix)}
+func (l MyLogger) WithPrefix(prefix string) (log Logger) {
+	log = MyLogger{
+		log:    l.log.Named(prefix),
+		level:  l.level,
+		prefix: append(l.prefix, prefix),
+		fields: l.fields,
+	}
+	return
 }
 func (l MyLogger) Prefix() string {
-	return ""
+	return strings.Join(l.prefix, ".")
 }
 func (l MyLogger) Fields() Fields {
-	return make(map[string]interface{})
+	if l.fields == nil {
+		return make(Fields)
+	}
+	return l.fields
 }
-func (l MyLogger) WithFields(fields Fields) Logger {
+func (l MyLogger) WithFields(fields Fields) (log Logger) {
 	fs := make([]zap.Field, 0)
-
 	for k, v := range fields {
+		l.fields[k] = v
+	}
+	for k, v := range l.fields {
 		fs = append(fs, zap.Any(k, v))
 	}
-	return MyLogger{*(l.With(fs...))}
+	log = MyLogger{
+		log:    l.log.With(fs...),
+		level:  l.level,
+		prefix: l.prefix,
+		fields: l.fields,
+	}
+	return
 }
 
 func (l MyLogger) SetLevel(level Level) {
@@ -320,8 +348,18 @@ func (l MyLogger) SetLevel(level Level) {
 func (l MyLogger) Section() (s string) {
 	return
 }
-func (l MyLogger) WithSection(fileds string) (ws Logger) {
-	ws = MyLogger{*(l.With(zap.String("fileds", fileds)))}
+func (l MyLogger) WithSection(sec string) (log Logger) {
+	fs := make([]zap.Field, 0)
+	l.fields["section"] = sec
+	for k, v := range l.fields {
+		fs = append(fs, zap.Any(k, v))
+	}
+	log = MyLogger{
+		log:    l.log.With(zap.String("section", sec)),
+		level:  l.level,
+		prefix: l.prefix,
+		fields: l.fields,
+	}
 	return
 }
 
@@ -395,14 +433,22 @@ func InitLogger(logger LoggerConfig) {
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 	level := zap.InfoLevel
+	myLevel := TraceLevel
 	switch strings.ToLower(logger.Level) {
+	case "trace":
+		myLevel = TraceLevel
+		level = zap.DebugLevel
 	case "debug":
+		myLevel = DebugLevel
 		level = zap.DebugLevel
 	case "warn":
+		myLevel = WarnLevel
 		level = zap.WarnLevel
 	case "info":
+		myLevel = InfoLevel
 		level = zap.InfoLevel
 	case "error":
+		myLevel = ErrorLevel
 		level = zap.ErrorLevel
 	default:
 		level = zap.InfoLevel
@@ -413,10 +459,11 @@ func InitLogger(logger LoggerConfig) {
 		level,
 	)
 	Log = MyLogger{
-		*zap.New(core),
+		log:    zap.New(core),
+		level:  myLevel,
+		fields: make(map[string]interface{}),
 	}
 	isInit = true
-
 }
 
 func LogPathExists(path string) bool {
@@ -428,113 +475,127 @@ func LogPathExists(path string) bool {
 }
 
 func Print(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		Log.Sugar().Info(args...)
+		Log.log.Sugar().Info(args...)
 	} else {
 		fmt.Println(args)
 	}
 }
 func Printf(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		Log.Sugar().Infof(format, args...)
+		Log.log.Sugar().Infof(format, args...)
 	} else {
 		fmt.Printf(format+"\r\n", args...)
 	}
 }
 func Println(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
-	Log.Info(args...)
+	if isInit {
+		Log.log.Sugar().Info(args)
+	} else {
+		fmt.Print(args...)
+	}
+
 }
 func Trace(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
-	Log.Debug(args...)
+	if isInit {
+		if Log.level == TraceLevel {
+			Log.log.Sugar().Debug(args...)
+		}
+	} else {
+		fmt.Println(args...)
+	}
 }
 func Tracef(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
-	Log.Debugf(format, args...)
+	if isInit {
+		if Log.level == TraceLevel {
+			Log.log.Sugar().Debugf(format, args...)
+		}
+	} else {
+		fmt.Printf(format+"\r\n", args...)
+	}
 }
 
 func Debug(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
-	Log.Debug(args...)
+	if isInit {
+		Log.log.Sugar().Debug(args...)
+	} else {
+		fmt.Println(args...)
+	}
 }
 func Debugf(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
-	Log.Debugf(format, args...)
+	if isInit {
+		Log.log.Sugar().Debugf(format, args...)
+	} else {
+		fmt.Printf(format+"\r\n", args...)
+	}
 }
 func Info(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
-	Log.Info(args...)
+	if isInit {
+		Log.log.Sugar().Info(args...)
+	} else {
+		fmt.Println(args...)
+	}
 }
 func Infof(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
-	Log.Infof(format, args...)
+	if isInit {
+		Log.log.Sugar().Infof(format, args...)
+	} else {
+		fmt.Printf(format+"\r\n", args...)
+	}
 }
 func Warn(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
-	Log.Warn(args...)
+	if isInit {
+		Log.log.Sugar().Warn(args...)
+	} else {
+		fmt.Println(args...)
+	}
 }
 func Warnf(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
-	Log.Warnf(format, args...)
+	if isInit {
+		Log.log.Sugar().Warnf(format, args...)
+	} else {
+		fmt.Printf(format+"\r\n", args...)
+	}
 }
 func Panic(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
-	Log.Panic(args...)
+	if isInit {
+		Log.log.Sugar().Panic(args...)
+	} else {
+		fmt.Println(args...)
+	}
 }
 func Panicf(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
-	Log.Panicf(format, args...)
-}
-func Fatal(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
-	Log.Fatal(args...)
+	if isInit {
+		Log.log.Sugar().Panicf(format, args...)
+	} else {
+		fmt.Printf(format+"\r\n", args...)
+	}
 }
 func Error(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
-	Log.Error(args...)
+	if isInit {
+		Log.log.Sugar().Error(args...)
+	} else {
+		fmt.Println(args...)
+	}
 }
 func Errorf(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
-	Log.Errorf(format, args...)
+	if isInit {
+		Log.log.Sugar().Errorf(format, args...)
+	} else {
+		fmt.Printf(format+"\r\n", args...)
+	}
+}
+func Fatal(args ...interface{}) {
+	if isInit {
+		Log.log.Sugar().Fatal(args...)
+	} else {
+		fmt.Println(args...)
+	}
 }
 func Fatalf(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
-	Log.Fatalf(format, args...)
+	if isInit {
+		Log.log.Sugar().Fatalf(format, args...)
+	} else {
+		fmt.Printf(format+"\r\n", args...)
+	}
 }
