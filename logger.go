@@ -67,17 +67,7 @@ func (fields Fields) String() string {
 }
 
 func (fields Fields) WithFields(newFields Fields) Fields {
-	allFields := make(Fields)
-
-	for k, v := range fields {
-		allFields[k] = v
-	}
-
-	for k, v := range newFields {
-		allFields[k] = v
-	}
-
-	return allFields
+	return newFields
 }
 
 type Level uint32
@@ -292,20 +282,14 @@ func (l MyLogger) Fields() Fields {
 }
 func (l MyLogger) WithFields(fields Fields) (log Logger) {
 	fs := make([]zap.Field, 0)
-	if l.fields == nil {
-		l.fields = make(map[string]interface{})
-	}
 	for k, v := range fields {
-		l.fields[k] = v
-	}
-	for k, v := range l.fields {
 		fs = append(fs, zap.Any(k, v))
 	}
 	log = MyLogger{
 		log:    l.log.With(fs...),
 		level:  l.level,
 		prefix: l.prefix,
-		fields: l.fields,
+		fields: fields,
 	}
 	return
 }
