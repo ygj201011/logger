@@ -120,7 +120,7 @@ func AddFieldsFrom(logger Logger, values ...interface{}) Logger {
 }
 
 var (
-	Log    MyLogger
+	mylog  MyLogger
 	isInit bool
 )
 
@@ -135,175 +135,141 @@ func (l MyLogger) Print(args ...interface{}) {
 	if isInit {
 		l.log.Sugar().Info(args...)
 	} else {
-		fmt.Println(args)
+		fmt.Println(args...)
 	}
 }
 func (l MyLogger) IsInit() bool {
 	return isInit
 }
-func (l MyLogger) Printf(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
+func addCodeInfo(format string) (r string) {
+	r = format
+	// _, file, line, _ := runtime.Caller(2)
+	// fileList := strings.Split(file, "/")
+	// r = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	return
+}
+func appendCodeInfo(args []interface{}) (r []interface{}) {
+	r = args
+	_, file, line, _ := runtime.Caller(2)
 	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args)
+	return
+}
+func (l MyLogger) Printf(format string, args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Infof(format, args...)
+		l.log.Sugar().Infof(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) Println(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.log.Sugar().Info(args...)
+		l.log.Sugar().Info(appendCodeInfo(args)...)
 	} else {
-		fmt.Println(args)
+		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Trace(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
 		if l.level == TraceLevel {
-			l.log.Sugar().Debug(args...)
+			l.log.Sugar().Debug(appendCodeInfo(args)...)
 		}
 	} else {
-		fmt.Println(args)
+		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Tracef(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
 		if l.level == TraceLevel {
-			l.log.Sugar().Debugf(format, args...)
+			l.log.Sugar().Debugf(addCodeInfo(format), args...)
 		}
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 
 func (l MyLogger) Debug(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.log.Sugar().Debug(args...)
+		l.log.Sugar().Debug(appendCodeInfo(args)...)
 	} else {
-		fmt.Println(args)
+		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Debugf(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.log.Sugar().Debugf(format, args...)
+		l.log.Sugar().Debugf(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) Info(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.log.Sugar().Info(args...)
+		l.log.Sugar().Info(appendCodeInfo(args)...)
 	} else {
-		fmt.Println(args)
+		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Infof(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.log.Sugar().Infof(format, args...)
+		l.log.Sugar().Infof(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) Warn(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.log.Sugar().Warn(args...)
+		l.log.Sugar().Warn(appendCodeInfo(args)...)
 	} else {
-		fmt.Println(args)
+		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Warnf(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.log.Sugar().Warnf(format, args...)
+		l.log.Sugar().Warnf(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) Panic(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.log.Sugar().Panic(args...)
+		l.log.Sugar().Panic(appendCodeInfo(args)...)
 	} else {
-		fmt.Println(args)
+		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Panicf(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.log.Sugar().Panicf(format, args...)
+		l.log.Sugar().Panicf(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) Fatal(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.log.Sugar().Fatal(args...)
+		l.log.Sugar().Fatal(appendCodeInfo(args)...)
 	} else {
-		fmt.Println(args)
+		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Error(args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args...)
 	if isInit {
-		l.log.Sugar().Error(args...)
+		l.log.Sugar().Error(appendCodeInfo(args)...)
 	} else {
-		fmt.Println(args)
+		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Errorf(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.log.Sugar().Errorf(format, args...)
+		l.log.Sugar().Errorf(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) Fatalf(format string, args ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
-	fileList := strings.Split(file, "/")
-	format = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	if isInit {
-		l.log.Sugar().Fatalf(format, args...)
+		l.log.Sugar().Fatalf(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) WithPrefix(prefix string) (log Logger) {
@@ -326,6 +292,9 @@ func (l MyLogger) Fields() Fields {
 }
 func (l MyLogger) WithFields(fields Fields) (log Logger) {
 	fs := make([]zap.Field, 0)
+	if l.fields == nil {
+		l.fields = make(map[string]interface{})
+	}
 	for k, v := range fields {
 		l.fields[k] = v
 	}
@@ -345,12 +314,19 @@ func (l MyLogger) SetLevel(level Level) {
 	//can't change level
 	return
 }
+func (l MyLogger) GetLevel() (level Level) {
+	//can't change level
+	return l.level
+}
 func (l MyLogger) Section() (s string) {
 	return
 }
 func (l MyLogger) WithSection(sec string) (log Logger) {
 	fs := make([]zap.Field, 0)
 	l.fields["section"] = sec
+	if l.fields == nil {
+		l.fields = make(map[string]interface{})
+	}
 	for k, v := range l.fields {
 		fs = append(fs, zap.Any(k, v))
 	}
@@ -364,7 +340,7 @@ func (l MyLogger) WithSection(sec string) (log Logger) {
 }
 
 func GetMyLogger() MyLogger {
-	return Log
+	return mylog
 }
 
 type LoggerConfig struct {
@@ -382,7 +358,7 @@ func InitLogger(logger LoggerConfig) {
 	logPath := "./"
 
 	if logPathAccessabel {
-		log.Println("Log Path not exist of not writable, use default path: ./")
+		log.Println("mylog Path not exist of not writable, use default path: ./")
 	} else {
 		logPath = logger.Path
 	}
@@ -458,7 +434,7 @@ func InitLogger(logger LoggerConfig) {
 		w,
 		level,
 	)
-	Log = MyLogger{
+	mylog = MyLogger{
 		log:    zap.New(core),
 		level:  myLevel,
 		fields: make(map[string]interface{}),
@@ -476,21 +452,21 @@ func LogPathExists(path string) bool {
 
 func Print(args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Info(args...)
+		mylog.log.Sugar().Info(appendCodeInfo(args)...)
 	} else {
-		fmt.Println(args)
+		fmt.Println(args...)
 	}
 }
 func Printf(format string, args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Infof(format, args...)
+		mylog.log.Sugar().Infof(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func Println(args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Info(args)
+		mylog.log.Sugar().Info(appendCodeInfo(args)...)
 	} else {
 		fmt.Print(args...)
 	}
@@ -498,8 +474,8 @@ func Println(args ...interface{}) {
 }
 func Trace(args ...interface{}) {
 	if isInit {
-		if Log.level == TraceLevel {
-			Log.log.Sugar().Debug(args...)
+		if mylog.level == TraceLevel {
+			mylog.log.Sugar().Debug(appendCodeInfo(args)...)
 		}
 	} else {
 		fmt.Println(args...)
@@ -507,95 +483,95 @@ func Trace(args ...interface{}) {
 }
 func Tracef(format string, args ...interface{}) {
 	if isInit {
-		if Log.level == TraceLevel {
-			Log.log.Sugar().Debugf(format, args...)
+		if mylog.level == TraceLevel {
+			mylog.log.Sugar().Debugf(addCodeInfo(format), args...)
 		}
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 
 func Debug(args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Debug(args...)
+		mylog.log.Sugar().Debug(appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Debugf(format string, args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Debugf(format, args...)
+		mylog.log.Sugar().Debugf(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func Info(args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Info(args...)
+		mylog.log.Sugar().Info(appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Infof(format string, args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Infof(format, args...)
+		mylog.log.Sugar().Infof(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func Warn(args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Warn(args...)
+		mylog.log.Sugar().Warn(appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Warnf(format string, args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Warnf(format, args...)
+		mylog.log.Sugar().Warnf(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func Panic(args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Panic(args...)
+		mylog.log.Sugar().Panic(appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Panicf(format string, args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Panicf(format, args...)
+		mylog.log.Sugar().Panicf(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func Error(args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Error(args...)
+		mylog.log.Sugar().Error(appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Errorf(format string, args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Errorf(format, args...)
+		mylog.log.Sugar().Errorf(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func Fatal(args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Fatal(args...)
+		mylog.log.Sugar().Fatal(appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Fatalf(format string, args ...interface{}) {
 	if isInit {
-		Log.log.Sugar().Fatalf(format, args...)
+		mylog.log.Sugar().Fatalf(addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(format+"\r\n", args...)
+		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
