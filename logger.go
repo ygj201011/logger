@@ -306,14 +306,6 @@ func (l MyLogger) Section() (s string) {
 	return
 }
 func (l MyLogger) WithSection(sec string) (log Logger) {
-	fs := make([]zap.Field, 0)
-	l.fields["section"] = sec
-	if l.fields == nil {
-		l.fields = make(map[string]interface{})
-	}
-	for k, v := range l.fields {
-		fs = append(fs, zap.Any(k, v))
-	}
 	log = MyLogger{
 		log:    l.log.With(zap.String("section", sec)),
 		level:  l.level,
