@@ -47,7 +47,7 @@ type Logger interface {
 	Fields() Fields
 
 	SetLevel(level Level)
-	IsInit() bool
+	GetLevel() Level
 }
 
 type Loggable interface {
@@ -297,6 +297,9 @@ func (l MyLogger) WithFields(fields Fields) (log Logger) {
 func (l MyLogger) SetLevel(level Level) {
 	//can't change level
 	return
+}
+func (l MyLogger) GetLevel() Level {
+	return l.level
 }
 func (l MyLogger) GetLevel() (level Level) {
 	//can't change level
