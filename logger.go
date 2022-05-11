@@ -73,7 +73,6 @@ func (fields Fields) WithFields(newFields Fields) Fields {
 type Level uint32
 
 // These are the different logging levels. You can set the logging level to log
-// on your instance of logger, obtained with `logrus.New()`.
 const (
 	// PanicLevel level, highest level of severity. Logs and then calls panic with the
 	// message passed to Debug, Info, ...
@@ -128,9 +127,6 @@ func (l MyLogger) Print(args ...interface{}) {
 	} else {
 		fmt.Println(args...)
 	}
-}
-func (l MyLogger) IsInit() bool {
-	return isInit
 }
 func (l MyLogger) addCodeInfo(format string) (r string) {
 	if l.codeLine {
