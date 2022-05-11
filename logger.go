@@ -115,10 +115,11 @@ var (
 )
 
 type MyLogger struct {
-	log    *zap.Logger
-	level  Level
-	prefix []string
-	fields Fields
+	log      *zap.Logger
+	level    Level
+	prefix   []string
+	fields   Fields
+	codeLine bool
 }
 
 func (l MyLogger) Print(args ...interface{}) {
@@ -131,11 +132,29 @@ func (l MyLogger) Print(args ...interface{}) {
 func (l MyLogger) IsInit() bool {
 	return isInit
 }
+func (l MyLogger) addCodeInfo(format string) (r string) {
+	if l.codeLine {
+		r = format
+		_, file, line, _ := runtime.Caller(2)
+		fileList := strings.Split(file, "/")
+		r = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	}
+	return
+}
+func (l MyLogger) appendCodeInfo(args []interface{}) (r []interface{}) {
+	if l.codeLine {
+		r = args
+		_, file, line, _ := runtime.Caller(2)
+		fileList := strings.Split(file, "/")
+		args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args)
+	}
+	return
+}
 func addCodeInfo(format string) (r string) {
 	r = format
-	// _, file, line, _ := runtime.Caller(2)
-	// fileList := strings.Split(file, "/")
-	// r = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	_, file, line, _ := runtime.Caller(2)
+	fileList := strings.Split(file, "/")
+	r = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
 	return
 }
 func appendCodeInfo(args []interface{}) (r []interface{}) {
@@ -147,14 +166,14 @@ func appendCodeInfo(args []interface{}) (r []interface{}) {
 }
 func (l MyLogger) Printf(format string, args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Infof(addCodeInfo(format), args...)
+		l.log.Sugar().Infof(l.addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
+		fmt.Printf(l.addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) Println(args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Info(appendCodeInfo(args)...)
+		l.log.Sugar().Info(l.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
@@ -162,7 +181,7 @@ func (l MyLogger) Println(args ...interface{}) {
 func (l MyLogger) Trace(args ...interface{}) {
 	if isInit {
 		if l.level == TraceLevel {
-			l.log.Sugar().Debug(appendCodeInfo(args)...)
+			l.log.Sugar().Debug(l.appendCodeInfo(args)...)
 		}
 	} else {
 		fmt.Println(args...)
@@ -171,103 +190,104 @@ func (l MyLogger) Trace(args ...interface{}) {
 func (l MyLogger) Tracef(format string, args ...interface{}) {
 	if isInit {
 		if l.level == TraceLevel {
-			l.log.Sugar().Debugf(addCodeInfo(format), args...)
+			l.log.Sugar().Debugf(l.addCodeInfo(format), args...)
 		}
 	} else {
-		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
+		fmt.Printf(l.addCodeInfo(format)+"\r\n", args...)
 	}
 }
 
 func (l MyLogger) Debug(args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Debug(appendCodeInfo(args)...)
+		l.log.Sugar().Debug(l.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Debugf(format string, args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Debugf(addCodeInfo(format), args...)
+		l.log.Sugar().Debugf(l.addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
+		fmt.Printf(l.addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) Info(args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Info(appendCodeInfo(args)...)
+		l.log.Sugar().Info(l.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Infof(format string, args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Infof(addCodeInfo(format), args...)
+		l.log.Sugar().Infof(l.addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
+		fmt.Printf(l.addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) Warn(args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Warn(appendCodeInfo(args)...)
+		l.log.Sugar().Warn(l.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Warnf(format string, args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Warnf(addCodeInfo(format), args...)
+		l.log.Sugar().Warnf(l.addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
+		fmt.Printf(l.addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) Panic(args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Panic(appendCodeInfo(args)...)
+		l.log.Sugar().Panic(l.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Panicf(format string, args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Panicf(addCodeInfo(format), args...)
+		l.log.Sugar().Panicf(l.addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
+		fmt.Printf(l.addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) Fatal(args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Fatal(appendCodeInfo(args)...)
+		l.log.Sugar().Fatal(l.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Error(args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Error(appendCodeInfo(args)...)
+		l.log.Sugar().Error(l.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func (l MyLogger) Errorf(format string, args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Errorf(addCodeInfo(format), args...)
+		l.log.Sugar().Errorf(l.addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
+		fmt.Printf(l.addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) Fatalf(format string, args ...interface{}) {
 	if isInit {
-		l.log.Sugar().Fatalf(addCodeInfo(format), args...)
+		l.log.Sugar().Fatalf(l.addCodeInfo(format), args...)
 	} else {
-		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
+		fmt.Printf(l.addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func (l MyLogger) WithPrefix(prefix string) (log Logger) {
 	log = MyLogger{
-		log:    l.log.Named(prefix),
-		level:  l.level,
-		prefix: append(l.prefix, prefix),
-		fields: l.fields,
+		log:      l.log.Named(prefix),
+		level:    l.level,
+		prefix:   append(l.prefix, prefix),
+		fields:   l.fields,
+		codeLine: l.codeLine,
 	}
 	return
 }
@@ -286,10 +306,11 @@ func (l MyLogger) WithFields(fields Fields) (log Logger) {
 		fs = append(fs, zap.Any(k, v))
 	}
 	log = MyLogger{
-		log:    l.log.With(fs...),
-		level:  l.level,
-		prefix: l.prefix,
-		fields: fields,
+		log:      l.log.With(fs...),
+		level:    l.level,
+		prefix:   l.prefix,
+		fields:   fields,
+		codeLine: l.codeLine,
 	}
 	return
 }
@@ -306,10 +327,11 @@ func (l MyLogger) Section() (s string) {
 }
 func (l MyLogger) WithSection(sec string) (log Logger) {
 	log = MyLogger{
-		log:    l.log.With(zap.String("section", sec)),
-		level:  l.level,
-		prefix: l.prefix,
-		fields: l.fields,
+		log:      l.log.With(zap.String("section", sec)),
+		level:    l.level,
+		prefix:   l.prefix,
+		fields:   l.fields,
+		codeLine: l.codeLine,
 	}
 	return
 }
@@ -326,6 +348,7 @@ type LoggerConfig struct {
 	MaxBackups     int    `json:"log_max_backup"`
 	MaxAge         int    `json:"log_max_age"`
 	EnableCompress int    `json:"log_compress"`
+	CodeLine       int    `json:"log_code_line"`
 }
 
 func InitLogger(logger LoggerConfig) {
@@ -344,6 +367,7 @@ func InitLogger(logger LoggerConfig) {
 	maxLogSize := logger.MaxSize
 	maxBackups := logger.MaxBackups
 	maxAge := logger.MaxAge
+	needCodeLine := false
 
 	var enableCompress bool
 	if maxLogSize == 0 {
@@ -354,6 +378,9 @@ func InitLogger(logger LoggerConfig) {
 	}
 	if maxAge == 0 {
 		maxAge = 7
+	}
+	if logger.CodeLine != 0 {
+		needCodeLine = true
 	}
 	if logger.EnableCompress == 1 {
 		enableCompress = true
@@ -410,9 +437,10 @@ func InitLogger(logger LoggerConfig) {
 		level,
 	)
 	mylog = MyLogger{
-		log:    zap.New(core),
-		level:  myLevel,
-		fields: make(map[string]interface{}),
+		log:      zap.New(core),
+		level:    myLevel,
+		fields:   make(map[string]interface{}),
+		codeLine: needCodeLine,
 	}
 	isInit = true
 }
@@ -427,21 +455,21 @@ func LogPathExists(path string) bool {
 
 func Print(args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Info(appendCodeInfo(args)...)
+		mylog.log.Sugar().Info(mylog.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Printf(format string, args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Infof(addCodeInfo(format), args...)
+		mylog.log.Sugar().Infof(mylog.addCodeInfo(format), args...)
 	} else {
 		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func Println(args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Info(appendCodeInfo(args)...)
+		mylog.log.Sugar().Info(mylog.appendCodeInfo(args)...)
 	} else {
 		fmt.Print(args...)
 	}
@@ -450,7 +478,7 @@ func Println(args ...interface{}) {
 func Trace(args ...interface{}) {
 	if isInit {
 		if mylog.level == TraceLevel {
-			mylog.log.Sugar().Debug(appendCodeInfo(args)...)
+			mylog.log.Sugar().Debug(mylog.appendCodeInfo(args)...)
 		}
 	} else {
 		fmt.Println(args...)
@@ -459,7 +487,7 @@ func Trace(args ...interface{}) {
 func Tracef(format string, args ...interface{}) {
 	if isInit {
 		if mylog.level == TraceLevel {
-			mylog.log.Sugar().Debugf(addCodeInfo(format), args...)
+			mylog.log.Sugar().Debugf(mylog.addCodeInfo(format), args...)
 		}
 	} else {
 		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
@@ -468,84 +496,84 @@ func Tracef(format string, args ...interface{}) {
 
 func Debug(args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Debug(appendCodeInfo(args)...)
+		mylog.log.Sugar().Debug(mylog.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Debugf(format string, args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Debugf(addCodeInfo(format), args...)
+		mylog.log.Sugar().Debugf(mylog.addCodeInfo(format), args...)
 	} else {
 		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func Info(args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Info(appendCodeInfo(args)...)
+		mylog.log.Sugar().Info(mylog.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Infof(format string, args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Infof(addCodeInfo(format), args...)
+		mylog.log.Sugar().Infof(mylog.addCodeInfo(format), args...)
 	} else {
 		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func Warn(args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Warn(appendCodeInfo(args)...)
+		mylog.log.Sugar().Warn(mylog.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Warnf(format string, args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Warnf(addCodeInfo(format), args...)
+		mylog.log.Sugar().Warnf(mylog.addCodeInfo(format), args...)
 	} else {
 		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func Panic(args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Panic(appendCodeInfo(args)...)
+		mylog.log.Sugar().Panic(mylog.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Panicf(format string, args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Panicf(addCodeInfo(format), args...)
+		mylog.log.Sugar().Panicf(mylog.addCodeInfo(format), args...)
 	} else {
 		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func Error(args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Error(appendCodeInfo(args)...)
+		mylog.log.Sugar().Error(mylog.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Errorf(format string, args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Errorf(addCodeInfo(format), args...)
+		mylog.log.Sugar().Errorf(mylog.addCodeInfo(format), args...)
 	} else {
 		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
 }
 func Fatal(args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Fatal(appendCodeInfo(args)...)
+		mylog.log.Sugar().Fatal(mylog.appendCodeInfo(args)...)
 	} else {
 		fmt.Println(args...)
 	}
 }
 func Fatalf(format string, args ...interface{}) {
 	if isInit {
-		mylog.log.Sugar().Fatalf(addCodeInfo(format), args...)
+		mylog.log.Sugar().Fatalf(mylog.addCodeInfo(format), args...)
 	} else {
 		fmt.Printf(addCodeInfo(format)+"\r\n", args...)
 	}
