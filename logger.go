@@ -301,10 +301,6 @@ func (l MyLogger) SetLevel(level Level) {
 func (l MyLogger) GetLevel() Level {
 	return l.level
 }
-func (l MyLogger) GetLevel() (level Level) {
-	//can't change level
-	return l.level
-}
 func (l MyLogger) Section() (s string) {
 	return
 }
