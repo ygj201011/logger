@@ -139,11 +139,11 @@ func (l MyLogger) addCodeInfo(format string) (r string) {
 }
 func (l MyLogger) appendCodeInfo(args []interface{}) (r []interface{}) {
 	if l.codeLine {
-		r = args
 		_, file, line, _ := runtime.Caller(2)
 		fileList := strings.Split(file, "/")
 		args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args)
 	}
+	r = args
 	return
 }
 func addCodeInfo(format string) (r string) {
@@ -154,10 +154,10 @@ func addCodeInfo(format string) (r string) {
 	return
 }
 func appendCodeInfo(args []interface{}) (r []interface{}) {
-	r = args
 	_, file, line, _ := runtime.Caller(2)
 	fileList := strings.Split(file, "/")
 	args = append([]interface{}{fmt.Sprintf("[%s:%d] ", fileList[len(fileList)-1], line)}, args)
+	r = args
 	return
 }
 func (l MyLogger) Printf(format string, args ...interface{}) {
