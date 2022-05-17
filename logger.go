@@ -349,10 +349,10 @@ func InitLogger(logger LoggerConfig) {
 	logPathAccessabel := LogPathExists(logger.Path)
 	logPath := "./"
 
-	if logPathAccessabel {
-		log.Println("mylog Path not exist of not writable, use default path: ./")
-	} else {
+	if logPathAccessabel {		
 		logPath = logger.Path
+	} else {
+		log.Println("mylog Path not exist of not writable, use default path: ./")
 	}
 	if logPath[len(logPath)-1:] == "/" {
 		logPath = logPath[0 : len(logPath)-1]
