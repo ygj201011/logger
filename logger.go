@@ -133,6 +133,8 @@ func (l MyLogger) addCodeInfo(format string) (r string) {
 		_, file, line, _ := runtime.Caller(2)
 		fileList := strings.Split(file, "/")
 		r = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
+	}else{
+		return format
 	}
 	return
 }
