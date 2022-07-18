@@ -1,3 +1,4 @@
+//Package logger for
 package logger
 
 import (
@@ -133,7 +134,7 @@ func (l MyLogger) addCodeInfo(format string) (r string) {
 		_, file, line, _ := runtime.Caller(2)
 		fileList := strings.Split(file, "/")
 		r = fmt.Sprintf("[%s:%d] %s", fileList[len(fileList)-1], line, format)
-	}else{
+	} else {
 		return format
 	}
 	return
@@ -312,8 +313,6 @@ func (l MyLogger) WithFields(fields Fields) (log Logger) {
 }
 
 func (l MyLogger) SetLevel(level Level) {
-	//can't change level
-	return
 }
 func (l MyLogger) GetLevel() Level {
 	return l.level
@@ -351,7 +350,7 @@ func InitLogger(logger LoggerConfig) {
 	logPathAccessabel := LogPathExists(logger.Path)
 	logPath := "./"
 
-	if logPathAccessabel {		
+	if logPathAccessabel {
 		logPath = logger.Path
 	} else {
 		log.Println("mylog Path not exist of not writable, use default path: ./")
@@ -443,10 +442,7 @@ func InitLogger(logger LoggerConfig) {
 
 func LogPathExists(path string) bool {
 	_, err := os.Stat(path)
-	if err == nil {
-		return true
-	}
-	return false
+	return err == nil
 }
 
 func Print(args ...interface{}) {
